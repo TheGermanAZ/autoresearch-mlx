@@ -1,3 +1,6 @@
 commit	val_bpb	memory_gb	status	description
 ba6ebf6	1.864735	21.2	keep	baseline
 96e8619	1.465359	18.7	keep	apply proven winners (depth=2 batch=2^15 SwiGLU 8/3x unembed LR 0.01)
+8be51ce	1.453490	18.7	keep	set final LR fraction to 0.1
+c9001d2	1.463971	18.7	discard	increase final LR fraction to 0.2 (too high)
+d15646f	1.458454	18.7	discard	reduce warmdown ratio from 0.5 to 0.3
