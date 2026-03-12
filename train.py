@@ -105,13 +105,13 @@ class CausalSelfAttention(nn.Module):
 class MLP(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd, bias=False)
-        self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd, bias=False)
+        hidden = (8 * config.n_embd) // 3
+        self.c_gate = nn.Linear(config.n_embd, hidden, bias=False)
+        self.c_up = nn.Linear(config.n_embd, hidden, bias=False)
+        self.c_proj = nn.Linear(hidden, config.n_embd, bias=False)
 
     def __call__(self, x):
-        x = self.c_fc(x)
-        x = mx.maximum(x, 0) ** 2
-        return self.c_proj(x)
+        return self.c_proj(mx.sigmoid(self.c_gate(x)) * self.c_up(x))
 
 
 class Block(nn.Module):
@@ -157,7 +157,8 @@ class GPT(nn.Module):
             block.attn.c_k.weight = mx.random.uniform(-scale, scale, block.attn.c_k.weight.shape).astype(mx.bfloat16)
             block.attn.c_v.weight = mx.random.uniform(-scale, scale, block.attn.c_v.weight.shape).astype(mx.bfloat16)
             block.attn.c_proj.weight = mx.zeros_like(block.attn.c_proj.weight).astype(mx.bfloat16)
-            block.mlp.c_fc.weight = mx.random.uniform(-scale, scale, block.mlp.c_fc.weight.shape).astype(mx.bfloat16)
+            block.mlp.c_gate.weight = mx.random.uniform(-scale, scale, block.mlp.c_gate.weight.shape).astype(mx.bfloat16)
+            block.mlp.c_up.weight = mx.random.uniform(-scale, scale, block.mlp.c_up.weight.shape).astype(mx.bfloat16)
             block.mlp.c_proj.weight = mx.zeros_like(block.mlp.c_proj.weight).astype(mx.bfloat16)
             if block.attn.ve_gate is not None:
                 block.attn.ve_gate.weight = mx.zeros_like(block.attn.ve_gate.weight).astype(mx.bfloat16)
@@ -361,19 +362,19 @@ HEAD_DIM = 128
 WINDOW_PATTERN = "SSSL"
 
 # v0.1: AdamW only. Muon port is future work.
-TOTAL_BATCH_SIZE = 2**16
+TOTAL_BATCH_SIZE = 2**15
 EMBEDDING_LR = 0.6
-UNEMBEDDING_LR = 0.004
+UNEMBEDDING_LR = 0.01
 MATRIX_LR = 0.04
 SCALAR_LR = 0.5
 WEIGHT_DECAY = 0.2
-ADAM_BETAS = (0.8, 0.95)
+ADAM_BETAS = (0.7, 0.95)
 WARMUP_RATIO = 0.0
 WARMDOWN_RATIO = 0.5
-FINAL_LR_FRAC = 0.0
+FINAL_LR_FRAC = 0.1
 
 # Model size
-DEPTH = 4
+DEPTH = 2
 DEVICE_BATCH_SIZE = 16
 FINAL_EVAL_BATCH_SIZE = 256
 STARTUP_EXCLUDE_STEPS = 1
