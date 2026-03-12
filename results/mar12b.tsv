@@ -1,0 +1,26 @@
+commit	val_bpb	memory_gb	status	description
+7c094ed	1.856230	21.2	keep	baseline
+d42fdea	1.810785	21.2	keep	reduce depth from 4 to 3
+e828280	1.602857	18.6	keep	reduce depth from 3 to 2
+b166b71	1.640773	18.6	discard	reduce depth from 2 to 1
+30a9600	1.501802	18.6	keep	halve total batch size to 2^15
+f3499b8	1.570578	18.6	discard	halve total batch size to 2^14 (too noisy)
+91b5fbb	1.592537	18.6	discard	double matrix LR to 0.08 (too high)
+cd4e471	1.521682	18.6	discard	halve matrix LR to 0.02
+512aa58	1.490168	19.6	keep	switch activation from squared ReLU to SiLU
+60a206d	1.531041	19.6	discard	add 5% warmup ratio (wastes steps)
+a298f38	1.761927	19.1	discard	reduce MLP expansion from 4x to 3x
+2de6c25	1.833427	19.6	discard	remove logit capping (much worse)
+f8e369b	2.006767	19.6	discard	reduce weight decay from 0.2 to 0.1 (slow steps)
+354e8c4	2.174331	22.6	discard	increase aspect ratio to 96 (too slow)
+9a3c3e5	1.926355	19.6	discard	increase warmdown ratio from 0.5 to 0.7
+78df381	2.555822	19.6	discard	reduce head dim from 128 to 64 (only 24 steps)
+9a1b0c0	1.468341	19.3	keep	SwiGLU-style gated MLP
+f07863a	1.448312	18.7	keep	reduce SwiGLU hidden from 4x to 8/3x (LLaMA-style)
+599c016	1.454070	18.3	discard	reduce SwiGLU hidden from 8/3x to 2x (too narrow)
+6afb338	1.566701	18.7	discard	disable value embeddings (worse quality)
+8c517e5	1.455730	18.7	discard	increase embedding LR from 0.6 to 1.0
+1101fa3	1.446924	18.7	keep	increase unembedding LR from 0.004 to 0.01
+b47f9af	1.456238	18.7	discard	increase adam beta1 from 0.8 to 0.9
+05a451b	1.465678	21.3	discard	increase depth from 2 to 3 with SwiGLU (too slow)
+4c4b6c3	0.000000	0.0	crash	enable value embeddings on all layers (interrupted)
